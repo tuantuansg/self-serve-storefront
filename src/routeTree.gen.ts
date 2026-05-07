@@ -9,38 +9,174 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ThanhToanRouteImport } from './routes/thanh-toan'
+import { Route as LienHeRouteImport } from './routes/lien-he'
+import { Route as GioiThieuRouteImport } from './routes/gioi-thieu'
+import { Route as GioHangRouteImport } from './routes/gio-hang'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SanPhamIndexRouteImport } from './routes/san-pham.index'
+import { Route as BaiVietIndexRouteImport } from './routes/bai-viet.index'
+import { Route as SanPhamSlugRouteImport } from './routes/san-pham.$slug'
+import { Route as BaiVietSlugRouteImport } from './routes/bai-viet.$slug'
 
+const ThanhToanRoute = ThanhToanRouteImport.update({
+  id: '/thanh-toan',
+  path: '/thanh-toan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LienHeRoute = LienHeRouteImport.update({
+  id: '/lien-he',
+  path: '/lien-he',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GioiThieuRoute = GioiThieuRouteImport.update({
+  id: '/gioi-thieu',
+  path: '/gioi-thieu',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GioHangRoute = GioHangRouteImport.update({
+  id: '/gio-hang',
+  path: '/gio-hang',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SanPhamIndexRoute = SanPhamIndexRouteImport.update({
+  id: '/san-pham/',
+  path: '/san-pham/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BaiVietIndexRoute = BaiVietIndexRouteImport.update({
+  id: '/bai-viet/',
+  path: '/bai-viet/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SanPhamSlugRoute = SanPhamSlugRouteImport.update({
+  id: '/san-pham/$slug',
+  path: '/san-pham/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BaiVietSlugRoute = BaiVietSlugRouteImport.update({
+  id: '/bai-viet/$slug',
+  path: '/bai-viet/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/gio-hang': typeof GioHangRoute
+  '/gioi-thieu': typeof GioiThieuRoute
+  '/lien-he': typeof LienHeRoute
+  '/thanh-toan': typeof ThanhToanRoute
+  '/bai-viet/$slug': typeof BaiVietSlugRoute
+  '/san-pham/$slug': typeof SanPhamSlugRoute
+  '/bai-viet/': typeof BaiVietIndexRoute
+  '/san-pham/': typeof SanPhamIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/gio-hang': typeof GioHangRoute
+  '/gioi-thieu': typeof GioiThieuRoute
+  '/lien-he': typeof LienHeRoute
+  '/thanh-toan': typeof ThanhToanRoute
+  '/bai-viet/$slug': typeof BaiVietSlugRoute
+  '/san-pham/$slug': typeof SanPhamSlugRoute
+  '/bai-viet': typeof BaiVietIndexRoute
+  '/san-pham': typeof SanPhamIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/gio-hang': typeof GioHangRoute
+  '/gioi-thieu': typeof GioiThieuRoute
+  '/lien-he': typeof LienHeRoute
+  '/thanh-toan': typeof ThanhToanRoute
+  '/bai-viet/$slug': typeof BaiVietSlugRoute
+  '/san-pham/$slug': typeof SanPhamSlugRoute
+  '/bai-viet/': typeof BaiVietIndexRoute
+  '/san-pham/': typeof SanPhamIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/gio-hang'
+    | '/gioi-thieu'
+    | '/lien-he'
+    | '/thanh-toan'
+    | '/bai-viet/$slug'
+    | '/san-pham/$slug'
+    | '/bai-viet/'
+    | '/san-pham/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/gio-hang'
+    | '/gioi-thieu'
+    | '/lien-he'
+    | '/thanh-toan'
+    | '/bai-viet/$slug'
+    | '/san-pham/$slug'
+    | '/bai-viet'
+    | '/san-pham'
+  id:
+    | '__root__'
+    | '/'
+    | '/gio-hang'
+    | '/gioi-thieu'
+    | '/lien-he'
+    | '/thanh-toan'
+    | '/bai-viet/$slug'
+    | '/san-pham/$slug'
+    | '/bai-viet/'
+    | '/san-pham/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GioHangRoute: typeof GioHangRoute
+  GioiThieuRoute: typeof GioiThieuRoute
+  LienHeRoute: typeof LienHeRoute
+  ThanhToanRoute: typeof ThanhToanRoute
+  BaiVietSlugRoute: typeof BaiVietSlugRoute
+  SanPhamSlugRoute: typeof SanPhamSlugRoute
+  BaiVietIndexRoute: typeof BaiVietIndexRoute
+  SanPhamIndexRoute: typeof SanPhamIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/thanh-toan': {
+      id: '/thanh-toan'
+      path: '/thanh-toan'
+      fullPath: '/thanh-toan'
+      preLoaderRoute: typeof ThanhToanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lien-he': {
+      id: '/lien-he'
+      path: '/lien-he'
+      fullPath: '/lien-he'
+      preLoaderRoute: typeof LienHeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gioi-thieu': {
+      id: '/gioi-thieu'
+      path: '/gioi-thieu'
+      fullPath: '/gioi-thieu'
+      preLoaderRoute: typeof GioiThieuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gio-hang': {
+      id: '/gio-hang'
+      path: '/gio-hang'
+      fullPath: '/gio-hang'
+      preLoaderRoute: typeof GioHangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +184,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/san-pham/': {
+      id: '/san-pham/'
+      path: '/san-pham'
+      fullPath: '/san-pham/'
+      preLoaderRoute: typeof SanPhamIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bai-viet/': {
+      id: '/bai-viet/'
+      path: '/bai-viet'
+      fullPath: '/bai-viet/'
+      preLoaderRoute: typeof BaiVietIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/san-pham/$slug': {
+      id: '/san-pham/$slug'
+      path: '/san-pham/$slug'
+      fullPath: '/san-pham/$slug'
+      preLoaderRoute: typeof SanPhamSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bai-viet/$slug': {
+      id: '/bai-viet/$slug'
+      path: '/bai-viet/$slug'
+      fullPath: '/bai-viet/$slug'
+      preLoaderRoute: typeof BaiVietSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GioHangRoute: GioHangRoute,
+  GioiThieuRoute: GioiThieuRoute,
+  LienHeRoute: LienHeRoute,
+  ThanhToanRoute: ThanhToanRoute,
+  BaiVietSlugRoute: BaiVietSlugRoute,
+  SanPhamSlugRoute: SanPhamSlugRoute,
+  BaiVietIndexRoute: BaiVietIndexRoute,
+  SanPhamIndexRoute: SanPhamIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -42,7 +42,9 @@ export const cartStore = {
   subscribe(cb: () => void) {
     ensureInit();
     listeners.add(cb);
-    return () => listeners.delete(cb);
+    return () => {
+      listeners.delete(cb);
+    };
   },
   get() {
     ensureInit();

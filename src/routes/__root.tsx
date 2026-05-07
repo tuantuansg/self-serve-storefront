@@ -74,9 +74,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Kệ Sắt Tiến Phát chuyên cung cấp kệ V lỗ, kệ siêu thị, kệ kho hàng công nghiệp chất lượng cao, giá tốt.",
       },
-      { property: "og:title", content: "Kệ Sắt Tiến Phát" },
-      { property: "og:description", content: "Kệ V lỗ, kệ siêu thị, kệ kho hàng giá tốt." },
+      { property: "og:title", content: "Kệ Sắt Tiến Phát — Kệ V lỗ, Kệ siêu thị, Kệ kho hàng" },
+      { property: "og:description", content: "Builds a self-contained React/Vite web app for traditional shared hosting." },
       { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Kệ Sắt Tiến Phát — Kệ V lỗ, Kệ siêu thị, Kệ kho hàng" },
+      { name: "description", content: "Builds a self-contained React/Vite web app for traditional shared hosting." },
+      { name: "twitter:description", content: "Builds a self-contained React/Vite web app for traditional shared hosting." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c88c5fe3-874b-4bef-9c88-03679df84dcc/id-preview-5a9841a9--ee91b360-9805-4588-abe0-fb45c69b8968.lovable.app-1778162512466.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c88c5fe3-874b-4bef-9c88-03679df84dcc/id-preview-5a9841a9--ee91b360-9805-4588-abe0-fb45c69b8968.lovable.app-1778162512466.png" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

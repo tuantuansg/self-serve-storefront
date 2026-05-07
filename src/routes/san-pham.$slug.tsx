@@ -68,7 +68,7 @@ function ProductDetail() {
           <div className="mt-6 rounded-lg border border-border bg-card p-4">
             <h3 className="mb-3 text-sm font-semibold">Thông số kỹ thuật</h3>
             <dl className="grid gap-2 text-sm">
-              {product.specs.map((s) => (
+              {product.specs.map((s: { label: string; value: string }) => (
                 <div key={s.label} className="flex justify-between border-b border-border/50 py-1.5 last:border-0">
                   <dt className="text-muted-foreground">{s.label}</dt>
                   <dd className="font-medium">{s.value}</dd>

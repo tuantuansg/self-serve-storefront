@@ -1,4 +1,5 @@
-import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import { ShoppingCart, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/use-cart";
@@ -11,7 +12,7 @@ const navItems = [
   { to: "/lien-he", label: "Liên hệ" },
 ] as const;
 
-export function SiteLayout() {
+export function SiteLayout({ children }: { children: ReactNode }) {
   const { totalItems } = useCart();
   const [open, setOpen] = useState(false);
   const { location } = useRouterState();

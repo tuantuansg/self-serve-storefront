@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/SiteLayout";
 import { ProductCard } from "@/components/ProductCard";
-import { products } from "@/data/products";
-import { posts } from "@/data/posts";
+import { supabase } from "@/integrations/supabase/client";
+import type { Product, Post } from "@/lib/types";
 import heroImg from "@/assets/hero-shelving.jpg";
 import { ArrowRight, ShieldCheck, Truck, Wrench, Award } from "lucide-react";
 
@@ -15,12 +16,34 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const featured = products.slice(0, 4);
-  const latestPosts = posts.slice(0, 3);
+  const { data: featured = [] } = useQuery({
+    queryKey: ["products", "featured"],
+    queryFn: async (): Promise<Product[]> => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .order("created_at", { ascending: true })
+        .limit(4);
+      if (error) throw error;
+      return (data ?? []) as unknown as Product[];
+    },
+  });
+
+  const { data: latestPosts = [] } = useQuery({
+    queryKey: ["posts", "latest"],
+    queryFn: async (): Promise<Post[]> => {
+      const { data, error } = await supabase
+        .from("posts")
+        .select("*")
+        .order("date", { ascending: false })
+        .limit(3);
+      if (error) throw error;
+      return (data ?? []) as unknown as Post[];
+    },
+  });
 
   return (
     <>
-      {/* Hero */}
       <section className="bg-hero-gradient">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 md:grid-cols-2 md:py-24">
           <div>
@@ -60,7 +83,6 @@ function Index() {
         </div>
       </section>
 
-      {/* Features */}
       <section className="mx-auto max-w-7xl px-4 py-16">
         <div className="grid gap-6 md:grid-cols-4">
           {[
@@ -80,7 +102,6 @@ function Index() {
         </div>
       </section>
 
-      {/* Featured products */}
       <section className="mx-auto max-w-7xl px-4 py-8">
         <div className="mb-8 flex items-end justify-between">
           <div>
@@ -96,7 +117,6 @@ function Index() {
         </div>
       </section>
 
-      {/* Latest posts */}
       <section className="mx-auto max-w-7xl px-4 py-16">
         <div className="mb-8">
           <h2 className="font-display text-3xl font-bold">Tin tức & kiến thức</h2>

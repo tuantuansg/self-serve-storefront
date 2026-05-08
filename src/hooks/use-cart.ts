@@ -1,9 +1,9 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
-import type { Product } from "@/data/products";
+import { useEffect, useState } from "react";
+import type { Product } from "@/lib/types";
 
 export type CartItem = { product: Product; quantity: number };
 
-const STORAGE_KEY = "tienphat_cart_v1";
+const STORAGE_KEY = "tienphat_cart_v2";
 let items: CartItem[] = [];
 const listeners = new Set<() => void>();
 
@@ -55,7 +55,7 @@ export const cartStore = {
     const existing = items.find((i) => i.product.id === product.id);
     if (existing) {
       items = items.map((i) =>
-        i.product.id === product.id ? { ...i, quantity: i.quantity + quantity } : i
+        i.product.id === product.id ? { ...i, quantity: i.quantity + quantity } : i,
       );
     } else {
       items = [...items, { product, quantity }];
@@ -68,9 +68,7 @@ export const cartStore = {
     if (quantity <= 0) {
       items = items.filter((i) => i.product.id !== productId);
     } else {
-      items = items.map((i) =>
-        i.product.id === productId ? { ...i, quantity } : i
-      );
+      items = items.map((i) => (i.product.id === productId ? { ...i, quantity } : i));
     }
     persist();
     emit();
@@ -89,7 +87,6 @@ export const cartStore = {
 };
 
 export function useCart() {
-  // SSR-safe: initial server snapshot returns empty array
   const [snapshot, setSnapshot] = useState<CartItem[]>([]);
   useEffect(() => {
     const update = () => setSnapshot([...cartStore.get()]);

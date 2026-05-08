@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/SiteLayout";
 import { ProductCard } from "@/components/ProductCard";
-import { products, categories } from "@/data/products";
+import { supabase } from "@/integrations/supabase/client";
+import type { Product } from "@/lib/types";
 
 export const Route = createFileRoute("/san-pham/")({
   head: () => ({
@@ -22,13 +24,30 @@ function ProductsPage() {
   const [cat, setCat] = useState<string>("Tất cả");
   const [q, setQ] = useState("");
 
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ["products", "all"],
+    queryFn: async (): Promise<Product[]> => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as unknown as Product[];
+    },
+  });
+
+  const categories = useMemo(
+    () => Array.from(new Set(products.map((p) => p.category))).filter(Boolean),
+    [products],
+  );
+
   const filtered = useMemo(() => {
     return products.filter((p) => {
       const matchCat = cat === "Tất cả" || p.category === cat;
       const matchQ = !q || p.name.toLowerCase().includes(q.toLowerCase());
       return matchCat && matchQ;
     });
-  }, [cat, q]);
+  }, [products, cat, q]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
@@ -62,7 +81,7 @@ function ProductsPage() {
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {filtered.map((p) => <ProductCard key={p.id} product={p} />)}
       </div>
-      {filtered.length === 0 && (
+      {!isLoading && filtered.length === 0 && (
         <p className="mt-12 text-center text-muted-foreground">Không tìm thấy sản phẩm.</p>
       )}
     </div>

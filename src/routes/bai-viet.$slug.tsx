@@ -1,42 +1,45 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/SiteLayout";
-import { posts } from "@/data/posts";
+import { supabase } from "@/integrations/supabase/client";
+import type { Post } from "@/lib/types";
 import { ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/bai-viet/$slug")({
-  loader: ({ params }) => {
-    const post = posts.find((p) => p.slug === params.slug);
-    if (!post) throw notFound();
-    return { post };
-  },
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.post.title} — Kệ Sắt Tiến Phát` },
-          { name: "description", content: loaderData.post.excerpt },
-          { property: "og:title", content: loaderData.post.title },
-          { property: "og:description", content: loaderData.post.excerpt },
-          { property: "og:image", content: loaderData.post.image },
-        ]
-      : [],
-  }),
   component: () => (
     <SiteLayout>
       <PostDetail />
     </SiteLayout>
   ),
-  notFoundComponent: () => (
-    <SiteLayout>
+});
+
+function PostDetail() {
+  const { slug } = Route.useParams();
+  const { data: post, isLoading } = useQuery({
+    queryKey: ["post", slug],
+    queryFn: async (): Promise<Post | null> => {
+      const { data, error } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as unknown as Post | null) ?? null;
+    },
+  });
+
+  if (isLoading) {
+    return <div className="mx-auto max-w-3xl px-4 py-24 text-center text-muted-foreground">Đang tải...</div>;
+  }
+  if (!post) {
+    return (
       <div className="mx-auto max-w-3xl px-4 py-24 text-center">
         <h1 className="font-display text-3xl font-bold">Không tìm thấy bài viết</h1>
         <Link to="/bai-viet" className="mt-4 inline-block text-primary hover:underline">← Về danh sách</Link>
       </div>
-    </SiteLayout>
-  ),
-});
+    );
+  }
 
-function PostDetail() {
-  const { post } = Route.useLoaderData();
   return (
     <article className="mx-auto max-w-3xl px-4 py-12">
       <nav className="mb-6 flex items-center gap-1 text-sm text-muted-foreground">
@@ -50,10 +53,10 @@ function PostDetail() {
         <span>•</span>
         <time>{new Date(post.date).toLocaleDateString("vi-VN")}</time>
       </div>
-      <img src={post.image} alt={post.title} className="mt-6 aspect-[16/9] w-full rounded-2xl object-cover" />
-      <div className="prose mt-8 max-w-none whitespace-pre-line text-foreground">
-        {post.content}
-      </div>
+      {post.image && (
+        <img src={post.image} alt={post.title} className="mt-6 aspect-[16/9] w-full rounded-2xl object-cover" />
+      )}
+      <div className="prose mt-8 max-w-none whitespace-pre-line text-foreground">{post.content}</div>
     </article>
   );
 }

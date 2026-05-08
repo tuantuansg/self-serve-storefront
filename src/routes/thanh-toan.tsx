@@ -4,6 +4,7 @@ import { z } from "zod";
 import { SiteLayout } from "@/components/SiteLayout";
 import { useCart } from "@/hooks/use-cart";
 import { formatVND } from "@/lib/format";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CheckCircle2 } from "lucide-react";
 
@@ -19,36 +20,18 @@ export const Route = createFileRoute("/thanh-toan")({
 const schema = z.object({
   name: z.string().trim().min(2, "Vui lòng nhập họ tên").max(100),
   phone: z.string().trim().regex(/^[0-9+\s-]{8,15}$/, "Số điện thoại không hợp lệ"),
-  email: z.string().trim().email("Email không hợp lệ").max(255).or(z.literal("")),
   address: z.string().trim().min(5, "Vui lòng nhập địa chỉ").max(300),
   note: z.string().trim().max(500).optional(),
 });
-
-type OrderRecord = {
-  id: string;
-  date: string;
-  customer: z.infer<typeof schema>;
-  items: { name: string; quantity: number; price: number }[];
-  total: number;
-};
-
-function saveOrderLocal(order: OrderRecord) {
-  if (typeof window === "undefined") return;
-  try {
-    const raw = localStorage.getItem("tienphat_orders_v1");
-    const list: OrderRecord[] = raw ? JSON.parse(raw) : [];
-    list.push(order);
-    localStorage.setItem("tienphat_orders_v1", JSON.stringify(list));
-  } catch {}
-}
 
 function CheckoutPage() {
   const { items, totalPrice, clear } = useCart();
   const navigate = useNavigate();
   const [done, setDone] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.currentTarget));
     const parsed = schema.safeParse(data);
@@ -61,16 +44,34 @@ function CheckoutPage() {
       return;
     }
     setErrors({});
-    const orderId = "DH" + Date.now().toString().slice(-8);
-    saveOrderLocal({
-      id: orderId,
-      date: new Date().toISOString(),
-      customer: parsed.data,
-      items: items.map((i) => ({ name: i.product.name, quantity: i.quantity, price: i.product.price })),
-      total: totalPrice,
-    });
+    setSubmitting(true);
+
+    const { data: order, error } = await supabase
+      .from("orders")
+      .insert({
+        customer_name: parsed.data.name,
+        phone: parsed.data.phone,
+        address: parsed.data.address,
+        note: parsed.data.note ?? "",
+        items: items.map((i) => ({
+          product_id: i.product.id,
+          name: i.product.name,
+          price: i.product.price,
+          quantity: i.quantity,
+        })),
+        total: totalPrice,
+        status: "pending",
+      })
+      .select("id")
+      .single();
+
+    setSubmitting(false);
+    if (error) {
+      toast.error("Đặt hàng thất bại: " + error.message);
+      return;
+    }
     clear();
-    setDone(orderId);
+    setDone(order!.id.slice(0, 8).toUpperCase());
     toast.success("Đặt hàng thành công");
   }
 
@@ -80,7 +81,7 @@ function CheckoutPage() {
         <CheckCircle2 className="mx-auto h-20 w-20 text-primary" />
         <h1 className="mt-6 font-display text-3xl font-bold">Đặt hàng thành công!</h1>
         <p className="mt-3 text-muted-foreground">
-          Mã đơn hàng: <span className="font-semibold text-foreground">{done}</span>
+          Mã đơn hàng: <span className="font-semibold text-foreground">DH-{done}</span>
         </p>
         <p className="mt-2 text-muted-foreground">Chúng tôi sẽ liên hệ bạn để xác nhận đơn hàng trong thời gian sớm nhất.</p>
         <button
@@ -110,7 +111,6 @@ function CheckoutPage() {
           {[
             { name: "name", label: "Họ và tên", type: "text", required: true },
             { name: "phone", label: "Số điện thoại", type: "tel", required: true },
-            { name: "email", label: "Email (tuỳ chọn)", type: "email" },
             { name: "address", label: "Địa chỉ giao hàng", type: "text", required: true },
           ].map((f) => (
             <div key={f.name}>
@@ -137,9 +137,10 @@ function CheckoutPage() {
           </div>
           <button
             type="submit"
-            className="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-soft hover:bg-primary/90"
+            disabled={submitting}
+            className="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-soft hover:bg-primary/90 disabled:opacity-60"
           >
-            Xác nhận đặt hàng
+            {submitting ? "Đang gửi..." : "Xác nhận đặt hàng"}
           </button>
         </form>
 

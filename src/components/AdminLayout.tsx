@@ -6,9 +6,9 @@ import { LayoutDashboard, Package, FileText, ShoppingBag, LogOut, Home } from "l
 
 const adminNav = [
   { to: "/admin", label: "Tổng quan", icon: LayoutDashboard, exact: true },
-  { to: "/admin/san-pham", label: "Sản phẩm", icon: Package },
-  { to: "/admin/bai-viet", label: "Bài viết", icon: FileText },
-  { to: "/admin/don-hang", label: "Đơn hàng", icon: ShoppingBag },
+  { to: "/admin/san-pham", label: "Sản phẩm", icon: Package, exact: false },
+  { to: "/admin/bai-viet", label: "Bài viết", icon: FileText, exact: false },
+  { to: "/admin/don-hang", label: "Đơn hàng", icon: ShoppingBag, exact: false },
 ] as const;
 
 export function AdminLayout() {

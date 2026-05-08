@@ -1,8 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { ShoppingCart, Menu, X } from "lucide-react";
+import { ShoppingCart, Menu, X, LogIn, LayoutDashboard } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/use-cart";
+import { useAuth } from "@/hooks/use-auth";
 
 const navItems = [
   { to: "/", label: "Trang chủ" },
@@ -14,6 +15,7 @@ const navItems = [
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   const { totalItems } = useCart();
+  const { user, isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
   const { location } = useRouterState();
 
@@ -46,6 +48,23 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="hidden items-center gap-1.5 rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-accent md:inline-flex"
+              >
+                <LayoutDashboard className="h-4 w-4" /> Quản trị
+              </Link>
+            )}
+            {!user && (
+              <Link
+                to="/dang-nhap"
+                className="hidden items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground md:inline-flex"
+                aria-label="Đăng nhập"
+              >
+                <LogIn className="h-4 w-4" /> Đăng nhập
+              </Link>
+            )}
             <Link
               to="/gio-hang"
               className="relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-secondary-foreground transition-colors hover:bg-accent"
@@ -81,14 +100,22 @@ export function SiteLayout({ children }: { children: ReactNode }) {
                   {item.label}
                 </Link>
               ))}
+              {isAdmin && (
+                <Link to="/admin" className="rounded-md px-3 py-3 text-sm font-medium">
+                  Quản trị
+                </Link>
+              )}
+              {!user && (
+                <Link to="/dang-nhap" className="rounded-md px-3 py-3 text-sm font-medium">
+                  Đăng nhập
+                </Link>
+              )}
             </nav>
           </div>
         )}
       </header>
 
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
 
       <footer className="mt-16 border-t border-border bg-secondary/40">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-4">
@@ -108,7 +135,9 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             <ul className="space-y-2 text-sm text-muted-foreground">
               {navItems.map((i) => (
                 <li key={i.to}>
-                  <Link to={i.to} className="hover:text-foreground">{i.label}</Link>
+                  <Link to={i.to} className="hover:text-foreground">
+                    {i.label}
+                  </Link>
                 </li>
               ))}
             </ul>

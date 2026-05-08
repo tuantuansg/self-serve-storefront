@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import type { Product } from "@/data/products";
+import type { Product } from "@/lib/types";
 import { formatVND } from "@/lib/format";
 import { cartStore } from "@/hooks/use-cart";
 import { ShoppingCart } from "lucide-react";
@@ -29,7 +29,7 @@ export function ProductCard({ product }: { product: Product }) {
         >
           {product.name}
         </Link>
-        <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{product.shortDesc}</p>
+        <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{product.short_desc}</p>
         <div className="mt-4 flex items-center justify-between">
           <span className="font-display text-lg font-semibold text-primary">
             {formatVND(product.price)}

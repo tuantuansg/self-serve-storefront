@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/SiteLayout";
-import { supabase } from "@/integrations/supabase/client";
-import type { Post } from "@/lib/types";
+import { fetchPostBySlug } from "@/data/static";
 import { ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/bai-viet/$slug")({
@@ -17,15 +16,7 @@ function PostDetail() {
   const { slug } = Route.useParams();
   const { data: post, isLoading } = useQuery({
     queryKey: ["post", slug],
-    queryFn: async (): Promise<Post | null> => {
-      const { data, error } = await supabase
-        .from("posts")
-        .select("*")
-        .eq("slug", slug)
-        .maybeSingle();
-      if (error) throw error;
-      return (data as unknown as Post | null) ?? null;
-    },
+    queryFn: () => fetchPostBySlug(slug),
   });
 
   if (isLoading) {

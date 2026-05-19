@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/SiteLayout";
-import { supabase } from "@/integrations/supabase/client";
-import type { Post } from "@/lib/types";
+import { fetchPosts } from "@/data/static";
 
 export const Route = createFileRoute("/bai-viet/")({
   head: () => ({
@@ -21,14 +20,7 @@ export const Route = createFileRoute("/bai-viet/")({
 function BlogIndex() {
   const { data: posts = [] } = useQuery({
     queryKey: ["posts", "all"],
-    queryFn: async (): Promise<Post[]> => {
-      const { data, error } = await supabase
-        .from("posts")
-        .select("*")
-        .order("date", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as unknown as Post[];
-    },
+    queryFn: fetchPosts,
   });
 
   return (

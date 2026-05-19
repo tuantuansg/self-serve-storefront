@@ -2,11 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/SiteLayout";
-import { supabase } from "@/integrations/supabase/client";
+import { fetchProductBySlug, fetchProducts } from "@/data/static";
 import { formatVND } from "@/lib/format";
 import { cartStore } from "@/hooks/use-cart";
 import { ProductCard } from "@/components/ProductCard";
-import type { Product } from "@/lib/types";
 import { ShoppingCart, Minus, Plus, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
@@ -24,31 +23,17 @@ function ProductDetail() {
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", slug],
-    queryFn: async (): Promise<Product | null> => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("slug", slug)
-        .maybeSingle();
-      if (error) throw error;
-      return (data as unknown as Product | null) ?? null;
-    },
+    queryFn: () => fetchProductBySlug(slug),
   });
 
-  const { data: related = [] } = useQuery({
-    queryKey: ["related", product?.category, product?.id],
+  const { data: all = [] } = useQuery({
+    queryKey: ["products", "all"],
+    queryFn: fetchProducts,
     enabled: !!product,
-    queryFn: async (): Promise<Product[]> => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("category", product!.category)
-        .neq("id", product!.id)
-        .limit(4);
-      if (error) throw error;
-      return (data ?? []) as unknown as Product[];
-    },
   });
+  const related = product
+    ? all.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4)
+    : [];
 
   if (isLoading) {
     return <div className="mx-auto max-w-3xl px-4 py-24 text-center text-muted-foreground">Đang tải...</div>;

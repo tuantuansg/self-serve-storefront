@@ -2,8 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/SiteLayout";
 import { ProductCard } from "@/components/ProductCard";
-import { supabase } from "@/integrations/supabase/client";
-import type { Product, Post } from "@/lib/types";
+import { fetchProducts, fetchPosts } from "@/data/static";
 import heroImg from "@/assets/hero-shelving.jpg";
 import { ArrowRight, ShieldCheck, Truck, Wrench, Award } from "lucide-react";
 
@@ -16,31 +15,17 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { data: featured = [] } = useQuery({
-    queryKey: ["products", "featured"],
-    queryFn: async (): Promise<Product[]> => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .order("created_at", { ascending: true })
-        .limit(4);
-      if (error) throw error;
-      return (data ?? []) as unknown as Product[];
-    },
+  const { data: products = [] } = useQuery({
+    queryKey: ["products", "all"],
+    queryFn: fetchProducts,
   });
+  const featured = products.slice(0, 4);
 
-  const { data: latestPosts = [] } = useQuery({
-    queryKey: ["posts", "latest"],
-    queryFn: async (): Promise<Post[]> => {
-      const { data, error } = await supabase
-        .from("posts")
-        .select("*")
-        .order("date", { ascending: false })
-        .limit(3);
-      if (error) throw error;
-      return (data ?? []) as unknown as Post[];
-    },
+  const { data: posts = [] } = useQuery({
+    queryKey: ["posts", "all"],
+    queryFn: fetchPosts,
   });
+  const latestPosts = posts.slice(0, 3);
 
   return (
     <>

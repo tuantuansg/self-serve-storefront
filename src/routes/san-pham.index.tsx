@@ -3,8 +3,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/SiteLayout";
 import { ProductCard } from "@/components/ProductCard";
-import { supabase } from "@/integrations/supabase/client";
-import type { Product } from "@/lib/types";
+import { fetchProducts } from "@/data/static";
 
 export const Route = createFileRoute("/san-pham/")({
   head: () => ({
@@ -26,14 +25,7 @@ function ProductsPage() {
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["products", "all"],
-    queryFn: async (): Promise<Product[]> => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .order("created_at", { ascending: true });
-      if (error) throw error;
-      return (data ?? []) as unknown as Product[];
-    },
+    queryFn: fetchProducts,
   });
 
   const categories = useMemo(
